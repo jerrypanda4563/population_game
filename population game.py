@@ -1,10 +1,9 @@
 import numpy as np
 import random
 from matplotlib import pyplot as plt
-import pandas as pd
-from typing import List, Tuple
+from typing import List
 from matplotlib.animation import FuncAnimation
-from concurrent.futures import ProcessPoolExecutor
+
 
 
 class StateAgent():
@@ -16,6 +15,7 @@ class StateAgent():
     def feed(self, resource: float) -> tuple:
         self.death = False
         self.replication = False
+        self.resource += resource
        
         if self.resource < 1:
             resource_consumed = self.resource        
@@ -39,7 +39,7 @@ class StateAgent():
             self.death = False
             self.replication = False
 
-        self.resource += resource
+        
 
         return self.death, self.replication
             
@@ -121,10 +121,8 @@ def simulate(n_agents: int, q_resources: list[float], n_iterations: int, equalit
         simulation = Environment(n_agents, q, equality = equality_mode)
         result =  simulation.run(n_iterations)
         results.append(result)
-    gini_results =[]
     for result in results:
         gini_coefficients = [calculate_gini(percentages) for percentages in result]
-        gini_results.append(gini_coefficients)
         fig, ax = plt.subplots()
         line, = ax.plot([], [], lw=2)
         # Setting the limits of x and y axes
@@ -141,18 +139,29 @@ def simulate(n_agents: int, q_resources: list[float], n_iterations: int, equalit
             x = range(len(y))
             line.set_data(x, y)
             return line,
-        ani = FuncAnimation(fig, update, frames=range(len(result)),init_func=init, blit=True, repeat=False, interval=100)
+        ani = FuncAnimation(fig, update, frames=range(len(result)),init_func=init, blit=True, repeat=False, interval=300)
         plt.show()
-    for ginis in gini_results:
-        plt.plot(ginis)
+        plt.plot(gini_coefficients)
         plt.show()
 
 
-simulate(500, [1000], 1000, equality_mode = False)
 
+
+
+simulate(100, [10, 30, 50, 70, 90], 500, equality_mode = False)
+simulate(100, [100, 200, 300, 400, 500], 500, equality_mode = False)
+simulate(100, [600,700,800,900,1000], 500, equality_mode = False)
+simulate(100, [1100, 1200, 1300, 1400, 1500], 500, equality_mode = False)
+
+#critical points
+simulate(100, [900, 920,940,960,980,1000], 500, equality_mode = False)
 
         
 
 
 
+simulate(100, [10, 30, 50, 70, 90], 500, equality_mode = True)
+simulate(100, [100, 200, 300, 400, 500], 500, equality_mode = True)
+simulate(100, [600,700,800,900,1000], 500, equality_mode = True)
+simulate(100, [1100, 1200, 1300, 1400, 1500], 500, equality_mode = True)
 
